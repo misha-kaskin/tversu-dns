@@ -1,5 +1,7 @@
-package admin;
+package models;
 
+import handlers.Configs;
+import handlers.StringAnnotation;
 import lombok.*;
 
 import java.util.List;
@@ -13,8 +15,11 @@ import java.util.Map;
 @Builder
 public class Ram implements UsedForFront {
     private Integer cost;
+    @StringAnnotation
     private String model;
+    @StringAnnotation(size = 70)
     private String manufacture;
+    @StringAnnotation(size = 80)
     private String typeOfMemory;
     private Integer memoryCapacity;
     private Double frequency;

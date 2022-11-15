@@ -1,9 +1,17 @@
-package admin;
+package views;
+
+import dao.CartDao;
+import dao.UserDao;
+import handlers.Listener;
+import handlers.Listeners;
+import models.CartItem;
+import models.UsedForFront;
+import models.User;
+import services.EntityManager;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,6 +19,7 @@ import java.util.List;
 
 public class AdminView {
     private final EntityManager entityManager = new EntityManager();
+    private final CartDao cd = new CartDao();
     private final UserDao userDao = new UserDao();
     private int entityIxd = 0;
     private int actionIdx = 0;
@@ -240,6 +249,7 @@ public class AdminView {
                 String login = deleteUserTextField.getText();
                 userDao.deleteUserById(login);
                 deleteUserTextField.setText("");
+                cd.deleteItemByLogin(login);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -268,6 +278,8 @@ public class AdminView {
 
                 updateUserPanel.add(updateUser, BorderLayout.CENTER);
                 updateUserPanel.updateUI();
+
+                cd.updateByLogin(login);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -365,6 +377,18 @@ public class AdminView {
                 for (Listener listener : Listeners.getListeners()) {
                     listener.update();
                 }
+
+                String[] classNames = itemType.getClass().getName().split("\\.");
+                String className = classNames[classNames.length - 1];
+
+                CartItem cartItem = CartItem.builder()
+                        .itemId(id)
+                        .itemTitle(item.getModel())
+                        .itemCost(item.getCost())
+                        .itemType(className)
+                        .build();
+
+                cd.updateById(cartItem);
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -386,6 +410,11 @@ public class AdminView {
                 for (Listener listener : Listeners.getListeners()) {
                     listener.update();
                 }
+
+                String[] classNames = itemType.getClass().getName().split("\\.");
+                String className = classNames[classNames.length - 1];
+
+                cd.deleteAllItemsById(className, id);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchFieldException e) {

@@ -1,14 +1,23 @@
-import admin.*;
+import dao.ItemDao;
+import handlers.Configs;
+import models.Cpu;
+import models.Ram;
+import models.User;
+import services.EntityManager;
+import views.AdminView;
+import views.UserView;
 
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Main {
     public static void main(String[] args) throws SQLException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InterruptedException {
-        new EntityManager();
+        EntityManager em = new EntityManager();
 
         Connection conn = DriverManager.getConnection(
                 Configs.DB_URL,
@@ -48,11 +57,14 @@ public class Main {
                 .numberOfModules(1)
                 .build();
 
+        //em.save(saveRam);
+        //System.out.println(em.getIdByItem(saveRam));
+
         //System.out.println(new ItemDao(Ram.class).updateItemById(saveRam,2));
 
         //System.out.println(ramDao.save(saveRam));
 
-        new UserView().createUserView();
+        new UserView("Misha").createUserView();
 
         new AdminView().createAdminWindow();
 

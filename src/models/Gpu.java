@@ -1,5 +1,7 @@
-package admin;
+package models;
 
+import handlers.Configs;
+import handlers.StringAnnotation;
 import lombok.*;
 
 import java.util.List;
@@ -13,12 +15,18 @@ import java.util.Map;
 @ToString
 public class Gpu implements UsedForFront {
     private Integer cost;
+    @StringAnnotation
     private String model;
+    @StringAnnotation
     private String manufacture;
+    @StringAnnotation
     private String graphicProcessor;
     private Integer memoryCapacity;
+    @StringAnnotation
     private String manufactureOfProcessor;
+    @StringAnnotation
     private String typeOfMemory;
+    @StringAnnotation
     private String connectionInterface;
 
     public String getTitle() {

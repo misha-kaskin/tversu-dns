@@ -1,4 +1,4 @@
-package admin;
+package handlers;
 
 public interface Configs {
     String DB_URL = "jdbc:postgresql://localhost:5432/tversu_dns";

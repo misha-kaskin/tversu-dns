@@ -1,4 +1,7 @@
-package admin;
+package dao;
+
+import handlers.Configs;
+import models.User;
 
 import java.sql.*;
 

@@ -1,5 +1,7 @@
-package admin;
+package models;
 
+import handlers.Configs;
+import handlers.StringAnnotation;
 import lombok.*;
 
 import java.util.List;
@@ -13,12 +15,17 @@ import java.util.Map;
 @ToString
 public class Cpu implements UsedForFront {
     private Integer cost;
+    @StringAnnotation
     private String model;
+    @StringAnnotation
     private String manufacture;
+    @StringAnnotation
     private String socket;
+    @StringAnnotation
     private String family;
     private Integer numberOfCores;
     private Integer year;
+    @StringAnnotation
     private String typeOfMemory;
     private Double frequency;
     private Integer technicalProcess;

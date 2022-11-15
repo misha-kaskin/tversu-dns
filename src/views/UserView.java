@@ -1,29 +1,41 @@
-package admin;
+package views;
+
+import dao.CartDao;
+import handlers.Configs;
+import handlers.Listener;
+import handlers.Listeners;
+import models.CartItem;
+import models.UsedForFront;
+import services.EntityManager;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class UserView {
     private final EntityManager em = new EntityManager();
-    private int offset;
+    private final CartDao cd = new CartDao();
+    private final String userLogin;
     private final List<String> sorts = List.of(
             Configs.SORT_BY_COST_ASC,
             Configs.SORT_BY_COST_DESC
     );
+    private int offset;
     private int sortIdx = 0;
 
     private UsedForFront filterConstraint;
     private UsedForFront itemConstraint;
+    private CartItem currentItem;
 
-    public UserView() throws SQLException {
+    public UserView(String userLogin) throws SQLException {
+        this.userLogin = userLogin;
     }
 
     public void createUserView() {
@@ -102,10 +114,38 @@ public class UserView {
         itemPanel.add(sortPanel, BorderLayout.NORTH);
 
         List<JButton> jButtonList = new ArrayList<>();
+        Map<JLabel, UsedForFront> selectedItems = new HashMap<>();
+
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem addInCart = new JMenuItem("Добавить в корзину");
+
+        addInCart.addActionListener(ActionListener -> {
+            try {
+                cd.save(currentItem);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        JMenuItem deleteFromCart = new JMenuItem("Удалить из корзины");
+
+        deleteFromCart.addActionListener(ActionListener -> {
+            try {
+                cd.deleteItemById(currentItem);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        menu.add(addInCart);
+        menu.addSeparator();
+        menu.add(deleteFromCart);
 
         Listener startPageListener = () -> {
             try {
                 itemInnerPanel.removeAll();
+                selectedItems.clear();
 
                 for (JButton button : jButtonList) {
                     button.setEnabled(true);
@@ -118,8 +158,44 @@ public class UserView {
                 itemInnerPanel.setLayout(new GridLayout(itemListConstraint.size(), 2, 1, 1));
 
                 for (UsedForFront usedForFront : itemListConstraint) {
-                    itemInnerPanel.add(new JLabel(usedForFront.getModel()));
+                    JLabel jLabel = new JLabel(usedForFront.getModel());
+
+                    selectedItems.put(jLabel, usedForFront);
+
+                    itemInnerPanel.add(jLabel);
                     itemInnerPanel.add(new JLabel(usedForFront.getCost() + " руб."));
+                }
+
+                for (JLabel jLabel : selectedItems.keySet()) {
+                    jLabel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                UsedForFront item = selectedItems.get(jLabel);
+
+                                String[] classNames = item.getClass().getName().split("\\.");
+                                String className = classNames[classNames.length - 1];
+
+                                currentItem = CartItem.builder()
+                                        .login(userLogin)
+                                        .itemId(em.getIdByItem(item))
+                                        .itemType(className)
+                                        .itemTitle(item.getModel())
+                                        .itemCost(item.getCost())
+                                        .build();
+
+                                deleteFromCart.setEnabled(cd.exists(currentItem));
+
+                                menu.show(e.getComponent(), e.getX(), e.getY());
+                            } catch (SQLException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (NoSuchFieldException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IllegalAccessException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    });
                 }
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
@@ -325,6 +401,9 @@ public class UserView {
                     filterPanel.removeAll();
                     comboBoxes.clear();
 
+                    paginationPanel.removeAll();
+                    jButtonList.clear();
+
                     int idx = itemSwitch.getSelectedIndex();
 
                     filterConstraint = items.get(idx).getClass().newInstance();
@@ -372,7 +451,10 @@ public class UserView {
         mainPanel.add(itemPanel, BorderLayout.CENTER);
         mainPanel.add(switchItemPanel, BorderLayout.NORTH);
 
-        JFrame frame = new JFrame("Пользователь");
+        JButton cartButton = new JButton("В корзину");
+        mainPanel.add(cartButton, BorderLayout.SOUTH);
+
+        JFrame frame = new JFrame("Пользователь: " + userLogin);
         frame.setSize(1150, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);

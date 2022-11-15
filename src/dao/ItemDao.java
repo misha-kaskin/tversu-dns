@@ -1,8 +1,15 @@
-package admin;
+package dao;
+
+import handlers.Configs;
+import handlers.StringAnnotation;
+import models.UsedForFront;
 
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ItemDao {
     private final Class myClass;
@@ -70,7 +77,8 @@ public class ItemDao {
                     } else if (field.toString().contains("Integer")) {
                         st.execute("ALTER TABLE " + className + " ADD COLUMN " + name + " int");
                     } else {
-                        st.execute("ALTER TABLE " + className + " ADD COLUMN " + name + " varchar(60)");
+                        StringAnnotation sa = (StringAnnotation) field.getAnnotations()[0];
+                        st.execute("ALTER TABLE " + className + " ADD COLUMN " + name + " varchar(" + sa.size() + ")");
                     }
                 }
             }
@@ -92,8 +100,11 @@ public class ItemDao {
                     sql.append(name)
                             .append(" int,");
                 } else {
+                    StringAnnotation sa = (StringAnnotation) field.getAnnotations()[0];
                     sql.append(name)
-                            .append(" varchar(60),");
+                            .append(" varchar(")
+                            .append(sa.size())
+                            .append("),");
                 }
             }
 
@@ -283,7 +294,7 @@ public class ItemDao {
                 .append(" WHERE true");
 
         makeSqlRequest.append(sqlRequest(constraint))
-                        .append(sort);
+                .append(sort);
 
         makeSqlRequest.append(" LIMIT 10 OFFSET ?");
 
@@ -513,5 +524,36 @@ public class ItemDao {
         }
 
         return filters;
+    }
+
+    public int getIdByUsedForFront(UsedForFront item) throws SQLException, NoSuchFieldException, IllegalAccessException {
+        Connection conn = DriverManager.getConnection(
+                Configs.DB_URL,
+                Configs.DB_USER,
+                Configs.DB_PASSWORD
+        );
+
+        String[] classNames = myClass.getName().split("\\.");
+        String className = classNames[classNames.length - 1];
+
+        StringBuilder request = new StringBuilder()
+                .append("SELECT id FROM ")
+                .append(className)
+                .append(" WHERE true")
+                .append(sqlRequest(item));
+
+        PreparedStatement ps = conn.prepareStatement(request.toString());
+        fillPreparedStatement(item, ps);
+
+        ResultSet rs = ps.executeQuery();
+
+        rs.next();
+
+        int res = rs.getInt(1);
+
+        ps.close();
+        conn.close();
+
+        return res;
     }
 }

@@ -1,4 +1,11 @@
-package admin;
+package services;
+
+import dao.ItemDao;
+import handlers.Configs;
+import models.Cpu;
+import models.Gpu;
+import models.Ram;
+import models.UsedForFront;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -61,5 +68,9 @@ public class EntityManager {
 
     public int getPageCount(UsedForFront constraint) throws SQLException, NoSuchFieldException, IllegalAccessException {
         return itemDao.get(constraint.getTitle()).getPageCount(constraint);
+    }
+
+    public int getIdByItem(UsedForFront item) throws SQLException, NoSuchFieldException, IllegalAccessException {
+        return itemDao.get(item.getTitle()).getIdByUsedForFront(item);
     }
 }
