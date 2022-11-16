@@ -1,5 +1,7 @@
+import dao.CartDao;
 import dao.ItemDao;
 import handlers.Configs;
+import models.CartDto;
 import models.Cpu;
 import models.Ram;
 import models.User;
@@ -96,5 +98,7 @@ public class Main {
                 .build()));
 
         System.out.println(userDao.deleteUserById(1));*/
+
+        //new CartDao().getCartDto("Misha");
     }
 }

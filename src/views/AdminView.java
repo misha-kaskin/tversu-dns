@@ -2,6 +2,7 @@ package views;
 
 import dao.CartDao;
 import dao.UserDao;
+import handlers.CartListeners;
 import handlers.Listener;
 import handlers.Listeners;
 import models.CartItem;
@@ -389,6 +390,10 @@ public class AdminView {
                         .build();
 
                 cd.updateById(cartItem);
+
+                for (Listener listener : CartListeners.getListeners()) {
+                    listener.update();
+                }
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -415,6 +420,10 @@ public class AdminView {
                 String className = classNames[classNames.length - 1];
 
                 cd.deleteAllItemsById(className, id);
+
+                for (Listener listener : CartListeners.getListeners()) {
+                    listener.update();
+                }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchFieldException e) {

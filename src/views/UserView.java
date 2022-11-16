@@ -1,6 +1,7 @@
 package views;
 
 import dao.CartDao;
+import handlers.CartListeners;
 import handlers.Configs;
 import handlers.Listener;
 import handlers.Listeners;
@@ -11,6 +12,7 @@ import services.EntityManager;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -123,7 +125,11 @@ public class UserView {
         addInCart.addActionListener(ActionListener -> {
             try {
                 cd.save(currentItem);
-            } catch (SQLException e) {
+
+                for (Listener listener : CartListeners.getListeners()) {
+                    listener.update();
+                }
+            } catch (SQLException | NoSuchFieldException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -133,7 +139,11 @@ public class UserView {
         deleteFromCart.addActionListener(ActionListener -> {
             try {
                 cd.deleteItemById(currentItem);
-            } catch (SQLException e) {
+
+                for (Listener listener : CartListeners.getListeners()) {
+                    listener.update();
+                }
+            } catch (SQLException | NoSuchFieldException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -453,6 +463,17 @@ public class UserView {
 
         JButton cartButton = new JButton("В корзину");
         mainPanel.add(cartButton, BorderLayout.SOUTH);
+        cartButton.addActionListener(ActionListener -> {
+            try {
+                new CartView(userLogin).createWindow();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         JFrame frame = new JFrame("Пользователь: " + userLogin);
         frame.setSize(1150, 400);

@@ -1,6 +1,7 @@
 package dao;
 
 import handlers.Configs;
+import models.CartDto;
 import models.CartItem;
 
 import java.sql.*;
@@ -228,5 +229,35 @@ public class CartDao {
         conn.close();
 
         return res > 0;
+    }
+
+    public List<CartDto> getCartDto(String login) throws SQLException {
+        Connection conn = DriverManager.getConnection(Configs.DB_URL,
+                Configs.DB_USER,
+                Configs.DB_PASSWORD);
+
+        PreparedStatement ps = conn.prepareStatement("SELECT item_title, count(item_title), cost " +
+                "FROM cart " +
+                "WHERE login LIKE ? " +
+                "GROUP BY item_title, cost");
+        ps.setString(1, login);
+
+        ResultSet rs = ps.executeQuery();
+        List<CartDto> cartDtoList = new ArrayList<>();
+
+        while (rs.next()) {
+            CartDto cartDto = CartDto.builder()
+                    .model(rs.getString(1))
+                    .number(rs.getInt(2))
+                    .cost(rs.getInt(3))
+                    .build();
+
+            cartDtoList.add(cartDto);
+        }
+
+        ps.close();
+        conn.close();
+
+        return cartDtoList;
     }
 }
