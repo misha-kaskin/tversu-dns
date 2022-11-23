@@ -1,12 +1,11 @@
 import dao.CartDao;
+import dao.CommentDao;
 import dao.ItemDao;
 import handlers.Configs;
-import models.CartDto;
-import models.Cpu;
-import models.Ram;
-import models.User;
+import models.*;
 import services.EntityManager;
 import views.AdminView;
+import views.CommentView;
 import views.UserView;
 
 import java.io.IOException;
@@ -16,10 +15,25 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws SQLException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InterruptedException {
+        //TODO
+        // Перебрать все БД с товарами
+        // Перебрать все товары из каждой БД
+        // Map<String, List<UsedForFront>> struct = new HashMap<>();
+        // Название товара(Процессор), UsedForFront
+
+        //TODO
+        // САМЫЙ популярный тип товара: String
+        // ВЫГРУЗИТЬ ВСЮ ТАБЛИЦУ
+        // List<UsedForFront> struct = new ArrayList<>();
+
         EntityManager em = new EntityManager();
+        CommentDao dao = new CommentDao();
 
         Connection conn = DriverManager.getConnection(
                 Configs.DB_URL,
@@ -100,5 +114,7 @@ public class Main {
         System.out.println(userDao.deleteUserById(1));*/
 
         //new CartDao().getCartDto("Misha");
+
+        new CommentView().createWindow();
     }
 }

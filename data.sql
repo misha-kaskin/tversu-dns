@@ -80,3 +80,13 @@ values
     (23, 'Goodram', 1199, 'Goodram', 'DDR3', 4, 1333, 1),
     (24, 'OCPC V-SERIES', 1199, 'OCPC', 'DDR4', 4, 2666, 1),
     (25, 'Patriot Signature Line', 1199, 'Patriot', 'DDR3', 4, 1333, 1) ON CONFLICT DO NOTHING;
+
+--INSERT INTO comments(id, parent, text, item_id, item_type, author)
+--VALUES
+   -- (1, -1, 'text1 jrejjrggrj jrelrejgrlejg rhgk erhkghe rejglr lgje lgrej gjreg', 1, 'gpu', 'misha'),
+   -- (2, 1, 'text2', 1, 'gpu', 'misha'),
+   -- (3, 2, 'text3', 1, 'gpu', 'misha'),
+   -- (4, 3, 'text4', 1, 'gpu', 'misha'),
+   -- (5, 4, 'text5', 1, 'gpu', 'misha'),
+  -- (6, 1, 'text6', 1, 'gpu', 'misha'),
+   -- (7, -1, 'text7', 1, 'gpu', 'misha') ON CONFLICT DO NOTHING;
