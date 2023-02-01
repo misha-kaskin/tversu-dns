@@ -1,4 +1,3 @@
-import dao.CartDao;
 import dao.CommentDao;
 import dao.ItemDao;
 import handlers.Configs;
@@ -15,9 +14,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws SQLException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InterruptedException {
